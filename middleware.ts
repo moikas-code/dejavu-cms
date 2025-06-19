@@ -1,15 +1,40 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
 
-const isProtectedRoute = createRouteMatcher([
+// Only import Clerk if it's configured
+const clerk_key = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+
+let clerkMiddleware: any;
+let createRouteMatcher: any;
+
+if (clerk_key) {
+  const clerkImports = require('@clerk/nextjs/server');
+  clerkMiddleware = clerkImports.clerkMiddleware;
+  createRouteMatcher = clerkImports.createRouteMatcher;
+}
+
+const isProtectedRoute = clerk_key ? createRouteMatcher([
   '/admin(.*)',
   '/api/admin(.*)',
-])
+]) : () => false;
 
-export default clerkMiddleware(async (auth, req) => {
-  if (isProtectedRoute(req)) {
-    await auth.protect()
+export default function middleware(req: NextRequest) {
+  // If Clerk is not configured, skip authentication
+  if (!clerk_key) {
+    // Still block admin routes if Clerk is not configured
+    if (req.nextUrl.pathname.startsWith('/admin') || req.nextUrl.pathname.startsWith('/api/admin')) {
+      return NextResponse.redirect(new URL('/', req.url));
+    }
+    return NextResponse.next();
   }
-})
+
+  // Use Clerk middleware if configured
+  return clerkMiddleware(async (auth: any, req: NextRequest) => {
+    if (isProtectedRoute(req)) {
+      await auth.protect();
+    }
+  })(req);
+}
 
 export const config = {
   matcher: [
