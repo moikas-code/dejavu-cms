@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --radius: 0.75rem;
+  }
+
+  * {
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+}
+
+@layer components {
+  .glass-morphism {
+    @apply bg-surface backdrop-blur-md border border-white/10 rounded-xl;
+  }
+
+  .glass-morphism-hover {
+    @apply hover:bg-surface-hover transition-all duration-200;
+  }
+
+  .gradient-border {
+    @apply relative;
+  }
+
+  .gradient-border::before {
+    content: "";
+    @apply absolute inset-0 rounded-xl p-[1px] -z-10;
+    background: linear-gradient(135deg, #6B46C1, #FFD700);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent;
+  }
+
+  .button-primary {
+    @apply px-6 py-3 bg-primary text-white rounded-lg font-medium transition-all duration-200;
+    @apply hover:bg-primary-light hover:shadow-lg hover:shadow-primary/25;
+    @apply active:scale-95;
+  }
+
+  .button-secondary {
+    @apply px-6 py-3 glass-morphism glass-morphism-hover text-white rounded-lg font-medium transition-all duration-200;
+    @apply hover:shadow-lg hover:shadow-white/10;
+    @apply active:scale-95;
+  }
+}
+
+@layer utilities {
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+}
